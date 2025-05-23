@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 import json
 
 from dotenv import load_dotenv
@@ -28,12 +28,11 @@ class NetworkDataExtract():
         try:
             data=pd.read_csv(file_path)
             data.reset_index(drop=True,inplace=True)
-            json_data = json.loads(data.T.to_json())
-            records = list(json_data.values())
+            records=list(json.loads(data.T.to_json()).values())
             return records
         except Exception as e:
             raise NetworkSecurityException(e,sys)
-
+        
     def insert_data_mongodb(self,records,database,collection):
         try:
             self.database=database
@@ -41,21 +40,23 @@ class NetworkDataExtract():
             self.records=records
 
             self.mongo_client=pymongo.MongoClient(MONGO_DB_URL)
-            self.database=self.mongo_client[self.database]
-
+            self.database = self.mongo_client[self.database]
+            
             self.collection=self.database[self.collection]
             self.collection.insert_many(self.records)
-            return len(self.records)
+            return(len(self.records))
         except Exception as e:
             raise NetworkSecurityException(e,sys)
-
-
-if __name__=="__main__":
-    FILE_PATH="Network_data\phisingData.csv"
-    DATABASE="ANURAG_AI"
+        
+if __name__=='__main__':
+    FILE_PATH="Network_Data\phisingData.csv"
+    DATABASE="KRISHAI"
     Collection="NetworkData"
-    Networkobj=NetworkDataExtract()
-    records=Networkobj.csv_to_json_convertor(file_path=FILE_PATH)
+    networkobj=NetworkDataExtract()
+    records=networkobj.csv_to_json_convertor(file_path=FILE_PATH)
     print(records)
-    no_of_records=Networkobj.insert_data_mongodb(records,DATABASE,Collection)
+    no_of_records=networkobj.insert_data_mongodb(records,DATABASE,Collection)
     print(no_of_records)
+        
+
+
